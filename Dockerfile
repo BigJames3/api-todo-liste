@@ -1,20 +1,26 @@
-# Image Node officielle (runtime pour exécuter JS côté serveur)
-FROM node:v20
+# Image officielle Node (proche de ton Node local v22.12.0)
+FROM node:22-alpine
 
 # Dossier de travail dans le conteneur
 WORKDIR /app
 
-# Copie des fichiers nécessaires à l'installation
+# Copie des fichiers nécessaires pour installer les dépendances
 COPY package*.json ./
 
-# Installation des dépendances Node
+# Installer les dépendances
 RUN npm install
 
-# Copie du reste du code source
+# Copier le reste du code source (exclut node_modules et dist via .dockerignore)
 COPY . .
 
-# Exposition du port utilisé par l'application
+# Si tu utilises TypeScript, builder le projet
+RUN npm run build
+
+# Exposer le port utilisé par l'application
 EXPOSE 3000
 
-# Commande pour démarrer l'application
-CMD ["npm", "start"]
+# Commande pour démarrer l'application compilée
+CMD ["node", "dist/main.js"]
+
+# # Commande pour démarrer l'application
+# CMD ["npm", "start"]
