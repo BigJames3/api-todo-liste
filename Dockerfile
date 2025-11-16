@@ -1,5 +1,5 @@
 # Image Node officielle (runtime pour exécuter JS côté serveur)
-FROM node:v22.12.0
+FROM node:v20
 
 # Dossier de travail dans le conteneur
 WORKDIR /app
