@@ -1,0 +1,50 @@
+# Nom du workflow affiché dans GitHub Actions
+name: Build and Push Docker Image
+
+# Déclenche le workflow automatiquement quand tu pushes sur la branche "main"
+on:
+  push:
+    branches:
+      - main
+
+# Définition des jobs (tâches) à exécuter
+jobs:
+  build:
+    # Machine virtuelle Ubuntu fournie par GitHub
+    runs-on: ubuntu-latest
+
+    # Liste des étapes du job
+    steps:
+
+      # Étape 1 : Récupérer le code source du repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Étape 2 : Configurer Node.js (si nécessaire pour build)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.12.0'   # Remplace par la version Node.js de ton projet
+
+      # Étape 3 : Installer les dépendances Node.js
+      - name: Install dependencies
+        run: npm install
+
+      # Étape 4 : Compiler le code TypeScript (si ton projet utilise TS)
+      - name: Build project
+        run: npm run build   # génère le dossier "dist" si tsconfig.json est configuré
+
+      # Étape 5 : Se connecter à Docker Hub avec les secrets GitHub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}  # nom Docker Hub
+          password: ${{ secrets.DOCKER_PASSWORD }}  # token généré dans Docker Hub
+
+      # Étape 6 : Construire l'image Docker
+      - name: Build Docker image
+        run: docker build -t traorenignaman/api-todo-liste .  # Remplace traorenignaman/api-todo-liste par ton nom d'image
+
+      # Étape 7 : Pousser l'image Docker vers Docker Hub
+      - name: Push Docker image
+        run: docker push traorenignaman/api-todo-liste       # Même nom que pour build

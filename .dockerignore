@@ -1,0 +1,9 @@
+# Évite de copier les dépendances dans l'image
+node_modules
+
+# Fichiers inutiles
+npm-debug.log
+
+# Ne copie pas Git dans l'image Docker
+.git
+.gitignore
