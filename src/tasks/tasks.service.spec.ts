@@ -1,6 +1,6 @@
 // Import des outils de test fournis par NestJS
 import { Test, TestingModule } from '@nestjs/testing';
-
+import { TasksController } from './tasks.controller';
 // Import du service que l'on souhaite tester
 import { TasksService } from './tasks.service';
 
@@ -16,6 +16,7 @@ describe('TasksService', () => {
     // Création d'un module de test NestJS
     // Ce module simule le module NestJS pour pouvoir injecter des providers
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [TasksController],
       providers: [TasksService], // On déclare le service que l'on teste
     }).compile(); // Compilation du module pour pouvoir récupérer les instances
 
