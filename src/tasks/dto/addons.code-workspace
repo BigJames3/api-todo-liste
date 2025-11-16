@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "C:/od/server/odoo/addons"
+		},
+		{
+			"path": "../../../../../THEME ANGULAR/adminpointagenumerique/Admin"
+		},
+		{
+			"path": "C:/wamp64/www/hureccom"
+		},
+		{
+			"path": "C:/wamp64/www/UpConstruction"
+		},
+		{
+			"path": "C:/wamp64/www/SiteFormationSap"
+		},
+		{
+			"path": "../../../../../tiktok_summarizer"
+		},
+		{
+			"path": "C:/wamp64/www/restaurant"
+		},
+		{
+			"path": "C:/wamp64/www/siteweb"
+		},
+		{
+			"path": "../../../.."
+		}
+	],
+	"settings": {}
+}
