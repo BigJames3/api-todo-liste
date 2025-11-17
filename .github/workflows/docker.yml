@@ -45,7 +45,7 @@ jobs:
 
       # 🔵 SonarCloud Scan
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2.1.0
+        uses: SonarSource/sonarcloud-github-action@<full-commit-sha>
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_SCANNER_OPTS: "-Xmx1024m"
@@ -54,7 +54,7 @@ jobs:
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.projectName=${{ secrets.SONAR_PROJECT_NAME }}
-            
+
       # Étape 6 : Déterminer le bon TAG Docker
       # - Si push sur un tag "v1.2.3" → image tag = "v1.2.3"
       # - Si push sur main → image tag = "latest"
