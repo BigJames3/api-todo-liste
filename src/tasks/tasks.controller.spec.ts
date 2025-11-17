@@ -1,6 +1,6 @@
 // Import des outils de test de NestJS
 import { Test, TestingModule } from '@nestjs/testing';
-
+import { TasksService } from './tasks.service';
 // Import du controller à tester
 import { TasksController } from './tasks.controller';
 
@@ -11,6 +11,7 @@ describe('TasksController', () => {
 
   // Déclaration d'une variable qui contiendra l'instance du controller
   let controller: TasksController;
+  let service: TasksService;
 
   // "beforeEach" est exécuté avant chaque test de cette suite
   beforeEach(async () => {
@@ -18,10 +19,12 @@ describe('TasksController', () => {
     // TestingModule simule le module Nest pour les tests
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TasksController], // on déclare le controller à tester
+      providers: [TasksService], // OBLIGATOIRE pour injecter le service
     }).compile(); // compile le module pour l'utiliser
 
     // Récupération de l'instance du controller depuis le module de test
     controller = module.get<TasksController>(TasksController);
+    service = module.get<TasksService>(TasksService);
   });
 
   // Déclaration d'un test
