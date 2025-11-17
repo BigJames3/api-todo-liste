@@ -65,6 +65,16 @@ jobs:
       - name: Build Docker image
         run: docker build -t traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }} .
 
+
+      # 🔍 8️⃣ Scan de sécurité avec Trivy
+      - name: Security Scan with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}'
+          format: 'table'
+          exit-code: '1'      # Stop le workflow si des vulnérabilités critiques sont trouvées
+          severity: 'CRITICAL,HIGH'
+
       # Étape 7 : Pousser l'image Docker vers Docker Hub
       - name: Push Docker image
         run: docker push traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}
