@@ -1,13 +1,13 @@
 # Nom du workflow affiché dans GitHub Actions
 name: Build and Push Docker Image
 
-# Déclenche le workflow automatiquement quand tu pushes sur la branche "main"
+# Déclenche le workflow automatiquement quand tu pushes sur la branche "main" & d'un tag
 on:
   push:
     branches:
-      - main
+      - main # - push sur la branche main
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*' # - push d'un tag commençant par v (ex : v1.0.0)
 
 # Définition des jobs (tâches) à exécuter
 jobs:
@@ -32,25 +32,39 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # Étape 4 : Exécuter les tests Jest avant de construire l'image Docker
+      # Si un test échoue → l'image NE sera PAS construite (bonne pratique CI)
       # ✅ Nouvelle étape : exécuter les tests avant le build Docker
       - name: Run tests
         run: npm test
 
-      # Étape 4 : Compiler le code TypeScript (si ton projet utilise TS)
+      # Étape 5 : Compiler le code TypeScript (si ton projet utilise TS)
       - name: Build project
         run: npm run build   # génère le dossier "dist" si tsconfig.json est configuré
 
-      # Étape 5 : Se connecter à Docker Hub avec les secrets GitHub
+      # Étape 6 : Déterminer le bon TAG Docker
+      # - Si push sur un tag "v1.2.3" → image tag = "v1.2.3"
+      # - Si push sur main → image tag = "latest"
+      - name: Set Docker Tag
+        id: vars
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
+      # Étape 7 : Se connecter à Docker Hub avec les secrets GitHub
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}  # nom Docker Hub
           password: ${{ secrets.DOCKER_PASSWORD }}  # token généré dans Docker Hub
 
-      # Étape 6 : Construire l'image Docker
+      # Étape  : Construire l'image Docker avec le TAG dynamique
       - name: Build Docker image
-        run: docker build -t traorenignaman/api-todo-liste:${GITHUB_REF#refs/tags/} .
+        run: docker build -t traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }} .
 
       # Étape 7 : Pousser l'image Docker vers Docker Hub
       - name: Push Docker image
-        run: docker push traorenignaman/api-todo-liste:${GITHUB_REF#refs/tags/}
+        run: docker push traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}
