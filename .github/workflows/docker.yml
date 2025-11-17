@@ -1,6 +1,6 @@
 # Nom du workflow affiché dans GitHub Actions
 name: Build and Push Docker Image
-
+ 
 # Déclenche le workflow automatiquement quand tu pushes sur la branche "main" & d'un tag
 on:
   push:
