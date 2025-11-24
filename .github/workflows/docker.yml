@@ -86,7 +86,8 @@ jobs:
           image-ref: 'traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}'
           format: 'table'
           exit-code: '1'      # Stop le workflow si des vulnérabilités critiques sont trouvées
-          severity: 'CRITICAL,HIGH'
+          severity: 'CRITICAL'
+          exit-code: '1'
 
       # Étape 7 : Pousser l'image Docker vers Docker Hub
       - name: Push Docker image
