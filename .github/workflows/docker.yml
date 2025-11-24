@@ -89,6 +89,7 @@ jobs:
           severity: 'CRITICAL'
           exit-code: '1'
 
+
       # Étape 7 : Pousser l'image Docker vers Docker Hub
       - name: Push Docker image
         run: docker push traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}
