@@ -1,64 +1,89 @@
-# Nom du workflow affiché dans GitHub Actions
-name: Build and Push Docker Image
- 
-# Déclenche le workflow automatiquement quand tu pushes sur la branche "main" & d'un tag
+name: CI/CD Pipeline - Build & Push Docker Image
+
 on:
   push:
     branches:
-      - main # - push sur la branche main
+      - main
     tags:
-      - 'v*.*.*' # - push d'un tag commençant par v (ex : v1.0.0)
+      - 'v*.*.*'
 
-# Définition des jobs (tâches) à exécuter
 jobs:
-  build:
-    # Machine virtuelle Ubuntu fournie par GitHub
-    runs-on: ubuntu-latest 
- 
-    # Liste des étapes du job
+
+  # 🧪 1️⃣ Unit Tests
+  unit-tests:
+    runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
 
-      # Étape 1 : Récupérer le code source du repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Étape 2 : Configurer Node.js (si nécessaire pour build)
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'   # Remplace par la version Node.js de ton projet
+          node-version: 20
+          cache: 'npm'
 
-      # Étape 3 : Installer les dépendances Node.js
       - name: Install dependencies
         run: npm install
 
-      # Étape 4 : Exécuter les tests Jest avant de construire l'image Docker
-      # Si un test échoue → l'image NE sera PAS construite (bonne pratique CI)
-      # ✅ Nouvelle étape : exécuter les tests avant le build Docker
-      - name: Run tests
+      - name: Run unit tests
         run: npm test
 
-      # Étape 5 : Compiler le code TypeScript (si ton projet utilise TS)
-      - name: Build project
-        run: npm run build   # génère le dossier "dist" si tsconfig.json est configuré
+
+  # 🧪 2️⃣ Integration Tests (optionnel si tu en as)
+  integration-tests:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+      - run: npm run test:integration || echo "No integration tests"
 
 
-      # 🔵 SonarCloud Scan
+  # 🏗️ 3️⃣ Build Application
+  build:
+    needs: integration-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+      - run: npm run build
+
+
+  # 📊 4️⃣ Qualité de code - SonarCloud
+  quality:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v5.0.0
+        uses: SonarSource/sonarcloud-github-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_SCANNER_OPTS: "-Xmx1024m"
         with:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.projectName=${{ secrets.SONAR_PROJECT_NAME }}
 
-      # Étape 6 : Déterminer le bon TAG Docker
-      # - Si push sur un tag "v1.2.3" → image tag = "v1.2.3"
-      # - Si push sur main → image tag = "latest"
-      - name: Set Docker Tag
+
+  # 🔐 5️⃣ Sécurité Docker - Trivy
+  security:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Docker tag
         id: vars
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
@@ -67,26 +92,41 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
 
-      # Étape 7 : Se connecter à Docker Hub avec les secrets GitHub
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}  # nom Docker Hub
-          password: ${{ secrets.DOCKER_PASSWORD }}  # token généré dans Docker Hub
+      - name: Build Docker image (local scan)
+        run: docker build -t traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }} .
 
-      # Étape  : Construire l'image Docker avec le TAG dynamique
+      - name: Trivy Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}
+          severity: CRITICAL
+          exit-code: 1
+
+
+  # 🚀 6️⃣ Docker Build & Push
+  docker:
+    needs: security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Docker tag
+        id: vars
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build Docker image
         run: docker build -t traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }} .
 
-      # 🔍 8️⃣ Scan de sécurité avec Trivy
-      - name: Security Scan with Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}'
-          format: 'table'
-          severity: 'CRITICAL'
-          exit-code: '1'  # Stop le workflow si des vulnérabilités critiques sont trouvées
-
-      # Étape 7 : Pousser l'image Docker vers Docker Hub
       - name: Push Docker image
         run: docker push traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}
