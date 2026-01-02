@@ -1,25 +1,12 @@
-// Import des décorateurs et utilitaires NestJS
-// Controller, Get, Post, Patch, Delete → pour déclarer les routes HTTP
-// Body → pour récupérer les données envoyées par le client
-// Param → pour récupérer un paramètre d'URL
-// ParseIntPipe → pour transformer le paramètre en nombre et valider
 import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
 
-// Import du service qui contient la logique métier
 import { TasksService } from './tasks.service';
 
-// Import du DTO utilisé pour valider les données lors de la création d'une tâche
 import { CreateTaskDto } from './dto/create-task.dto';
 
-// Déclaration du controller pour les routes "tasks"
 @Controller('tasks')  // Préfixe commun à toutes les routes de ce controller : /tasks
 export class TasksController {
-
-    // Injection du service TasksService via le constructeur
-    // "private readonly" → accessible dans toute la classe mais non modifiable
     constructor(private readonly tasksService: TasksService) {}
-
-    // GET /tasks → récupérer toutes les tâches
     @Get()
     getAllTasks() {
         return this.tasksService.findAll(); // Appelle le service pour obtenir toutes les tâches
@@ -56,11 +43,3 @@ export class TasksController {
     }
 
 }
-// | Terme / Décorateur                              | Utilité                                                                                       |
-// | ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
-// | `@Controller('tasks')`                          | Déclare que ce controller gère les routes `/tasks`                                            |
-// | `@Get()` / `@Post()` / `@Patch()` / `@Delete()` | Déclare les routes HTTP correspondantes                                                       |
-// | `@Param('id', ParseIntPipe)`                    | Récupère un paramètre d’URL et le convertit en nombre                                         |
-// | `@Body()`                                       | Récupère le corps de la requête et le valide via un DTO                                       |
-// | `Partial<CreateTaskDto>`                        | Permet d’accepter **une partie seulement** des champs pour une mise à jour                    |
-// | `tasksService`                                  | Service injecté contenant la **logique métier** : création, lecture, mise à jour, suppression |
