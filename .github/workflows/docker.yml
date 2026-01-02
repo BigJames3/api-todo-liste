@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  # 🧪 1️⃣ Unit Tests
+  # 1 Unit Tests
   unit-tests:
     runs-on: ubuntu-latest
     steps:
@@ -28,7 +28,7 @@ jobs:
         run: npm test
 
 
-  # 🧪 2️⃣ Integration Tests (optionnel si tu en as)
+  # 2 Integration Tests (optionnel si tu en as)
   integration-tests:
     needs: unit-tests
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
       - run: npm run test:integration || echo "No integration tests"
 
 
-  # 🏗️ 3️⃣ Build Application
+  # 3 Build Application
   build:
     needs: integration-tests
     runs-on: ubuntu-latest
@@ -58,7 +58,7 @@ jobs:
       - run: npm run build
 
 
-  # 📊 4️⃣ Qualité de code - SonarCloud
+  # 4 Qualité de code - SonarCloud
   quality:
     needs: build
     runs-on: ubuntu-latest
@@ -76,7 +76,7 @@ jobs:
             -Dsonar.projectName=${{ secrets.SONAR_PROJECT_NAME }}
 
 
-  # 🔐 5️⃣ Sécurité Docker - Trivy
+  # 5 Sécurité Docker - Trivy
   security:
     needs: quality
     runs-on: ubuntu-latest
@@ -103,7 +103,7 @@ jobs:
           exit-code: 1
 
 
-  # 🚀 6️⃣ Docker Build & Push
+  # 6 Docker Build & Push
   docker:
     needs: security
     runs-on: ubuntu-latest
