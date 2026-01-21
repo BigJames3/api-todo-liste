@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Build & Push Docker Image
+name: CI/CD Pipeline - Build, Push & Deploy Docker Image
 
 on:
   push:
@@ -130,3 +130,44 @@ jobs:
 
       - name: Push Docker image
         run: docker push traorenignaman/api-todo-liste:${{ steps.vars.outputs.tag }}
+
+  
+  # 7 DEPLOY (CD) - Ansible → Azure VM
+  deploy:
+    name: Deploy to Azure VM
+    needs: docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.AZURE_VM_IP }} >> ~/.ssh/known_hosts
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Set Docker tag
+        id: vars
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy with Ansible
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
+          DOCKER_TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          ansible-playbook \
+            -i ansible/inventory/azure.ini \
+            ansible/playbooks/setup_vm.yml \
+            --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"

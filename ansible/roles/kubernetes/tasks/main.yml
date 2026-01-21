@@ -1,0 +1,13 @@
+- name: Installer k3s
+  shell: curl -sfL https://get.k3s.io | sh -
+  args:
+    creates: /usr/local/bin/k3s
+
+- name: Copier kubeconfig pour kubectl
+  shell: |
+    mkdir -p /home/azureuser/.kube
+    cp /etc/rancher/k3s/k3s.yaml /home/azureuser/.kube/config
+    chown -R azureuser:azureuser /home/azureuser/.kube
+
+- name: Vérifier le cluster k3s
+  command: kubectl get nodes

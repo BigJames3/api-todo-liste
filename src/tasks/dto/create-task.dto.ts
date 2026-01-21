@@ -37,12 +37,3 @@ export class CreateTaskDto {
     // Ce champ représente la **description détaillée de la tâche**
     description: string;
 }
-
-// | Terme / Décorateur           | Utilisation / Signification                                                                                                                 |
-// | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-// | `DTO`                        | Data Transfer Object : objet qui sert à **transférer les données** entre le client et le serveur, souvent utilisé pour validation et typage |
-// | `@IsNotEmpty()`              | Vérifie que le champ n’est pas vide                                                                                                         |
-// | `@IsString()`                | Vérifie que le champ est une **chaîne de caractères**                                                                                       |
-// | `@MaxLength(n)`              | Vérifie que la chaîne ne dépasse pas `n` caractères                                                                                         |
-// | `@IsOptional()`              | Si utilisé, permet au champ d’être **facultatif** dans la requête (pas obligatoire)                                                         |
-// | `export class CreateTaskDto` | Permet d’exporter la classe pour l’utiliser dans d’autres fichiers (controllers ou services)                                                |
