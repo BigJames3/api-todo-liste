@@ -177,6 +177,6 @@ jobs:
           DOCKER_IMAGE: traorenignaman/api-todo-liste
           DOCKER_TAG: latest
         run: |
-          ansible-playbook ansible/playbooks/setup_vm.yml \
-            -i ansible/inventory/production.ini \
+          ansible-playbook playbooks/setup_vm.yml \
+            -i inventory/production.ini \
             --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
