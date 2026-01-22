@@ -173,10 +173,15 @@ jobs:
 
       # 🚀 DEPLOY
       - name: Deploy with Ansible
+        working-directory: ansible   # ⬅️ LA SEULE DIFFÉRENCE
         env:
           DOCKER_IMAGE: traorenignaman/api-todo-liste
           DOCKER_TAG: latest
         run: |
-          ansible-playbook playbooks/setup_vm.yml \
-            -i inventory/production.ini \
-            --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
+         ansible-playbook playbooks/setup_vm.yml \
+          -i inventory/production.ini \
+          --extra-vars "docker_image=traorenignaman/api-todo-liste:latest"
+
+         # ansible-playbook playbooks/setup_vm.yml \
+          #  -i inventory/production.ini \
+           # --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
