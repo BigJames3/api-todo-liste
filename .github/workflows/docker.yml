@@ -180,5 +180,4 @@ jobs:
         run: |
           echo "### THIS IS THE DEPLOY STEP I JUST MODIFIED ###"
           ansible-playbook playbooks/setup_vm.yml \
-            -i inventory/production.ini \
-            --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
+             --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
