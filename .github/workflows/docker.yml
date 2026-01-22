@@ -139,7 +139,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup SSH
         run: |
@@ -178,4 +179,4 @@ jobs:
           DOCKER_TAG: ${{ steps.vars.outputs.tag }}
         run: |
           ansible-playbook playbooks/setup_vm.yml \
-            --extra-vars "docker_image=traorenignaman/api-todo-liste:latest"
+            --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
