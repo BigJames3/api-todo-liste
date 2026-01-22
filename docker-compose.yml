@@ -2,14 +2,8 @@ version: "3.8"
 
 services:
   api:
-    # Build le conteneur à partir du Dockerfile
-    build: .
-    # Map le port du conteneur vers l’hôte
+    image: bigjames3/api-todo-liste:latest   # ⚠️ remplace par TON namespace exact
+    container_name: api-todo-liste
+    restart: always
     ports:
-      - "3000:3000"
-    # Synchronise les fichiers locaux avec le conteneur
-    volumes:
-      - .:/app
-      - /app/node_modules
-    # Relance l'app s'il y a un crash
-    restart: unless-stopped
+      - "80:3000"
