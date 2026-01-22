@@ -170,13 +170,12 @@ jobs:
           echo "Repository tree:"
           ls -R
 
-      # 🚀 DEPLOY – APRÈS LE DEBUG
+      # 🚀 DEPLOY
       - name: Deploy with Ansible
         working-directory: ansible
         env:
-          DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
+          DOCKER_IMAGE: traorenignaman/api-todo-liste
           DOCKER_TAG: ${{ steps.vars.outputs.tag }}
         run: |
           ansible-playbook playbooks/setup_vm.yml \
-            --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
-                
+            --extra-vars "docker_image=traorenignaman/api-todo-liste:latest"
