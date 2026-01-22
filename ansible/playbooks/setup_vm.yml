@@ -1,0 +1,9 @@
+- name: Setup Azure Ubuntu VM
+  hosts: azure
+  become: true
+
+  roles:
+    - common
+    - firewall
+    - docker
+    - app

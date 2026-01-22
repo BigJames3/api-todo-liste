@@ -1,0 +1,22 @@
+---
+# 1️⃣ Créer le dossier de l'application
+- name: Create application directory
+  file:
+    path: /opt/api-todo-liste
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+# 2️⃣ Déployer / Mettre à jour le container Docker
+- name: Deploy API Todo container
+  docker_container:
+    name: api-todo
+    image: "{{ docker_image }}"
+    state: started
+    restart_policy: always
+    recreate: yes
+    pull: yes
+    ports:
+      - "3000:3000"
+

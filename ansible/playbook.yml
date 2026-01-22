@@ -1,6 +1,0 @@
-- hosts: azure
-  become: true
-
-  roles:
-    - docker
-    - kubernetes

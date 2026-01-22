@@ -1,0 +1,14 @@
+- name: Update system
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install base packages
+  apt:
+    name:
+      - git
+      - curl
+      - vim
+      - ufw
+      - ca-certificates
+    state: present
