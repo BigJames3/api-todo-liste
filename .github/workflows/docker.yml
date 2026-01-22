@@ -181,4 +181,4 @@ jobs:
           echo "### THIS IS THE DEPLOY STEP I JUST MODIFIED ###"
           ansible-playbook playbook.yml \
              -i inventory.ini \
-             --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
+             --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"cd
