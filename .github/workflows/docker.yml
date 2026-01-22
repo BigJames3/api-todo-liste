@@ -162,6 +162,7 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
 
+
       - name: Deploy with Ansible
         env:
           DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
