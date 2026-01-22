@@ -162,12 +162,19 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
 
+      # 🔍 DEBUG – À AJOUTER ICI
+      - name: Debug filesystem
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Repository tree:"
+          ls -R
 
+      # 🚀 DEPLOY – APRÈS LE DEBUG
       - name: Deploy with Ansible
         env:
           DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
           DOCKER_TAG: ${{ steps.vars.outputs.tag }}
         run: |
-          cd ansible
           ansible-playbook playbooks/setup_vm.yml \
             --extra-vars "docker_image=${DOCKER_IMAGE}:${DOCKER_TAG}"
