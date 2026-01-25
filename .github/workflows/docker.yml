@@ -1,6 +1,7 @@
 name: CI/CD Pipeline - Build, Push & Deploy Docker Image
 
 on:
+  workflow_dispatch:
   # 1️ Analyse & tests AVANT merge (qualité du code)
   pull_request:
     branches:
@@ -72,13 +73,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Récupération du code avec l’historique complet (recommandé par Sonar)
-      - name: Checkout source code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      # 2️⃣ Analyse SonarCloud
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v2
         env:
@@ -91,7 +87,6 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.projectName=${{ secrets.SONAR_PROJECT_NAME }}
             -Dsonar.sources=src
-
 
 
   # 5 Sécurité Docker - Trivy
