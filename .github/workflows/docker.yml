@@ -1,6 +1,13 @@
 name: CI/CD Pipeline - Build, Push & Deploy Docker Image
 
 on:
+  # 1️ Analyse & tests AVANT merge (qualité du code)
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+  # 2️ Build & déploiement APRÈS validation
   push:
     branches:
       - main
@@ -66,7 +73,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v5
+        uses: SonarSource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
@@ -74,6 +81,7 @@ jobs:
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.projectName=${{ secrets.SONAR_PROJECT_NAME }}
+            -Dsonar.sources=src
 
 
   # 5 Sécurité Docker - Trivy
