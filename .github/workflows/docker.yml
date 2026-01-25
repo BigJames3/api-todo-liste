@@ -123,6 +123,7 @@ jobs:
   # 6 Docker Build & Push
   docker:
     needs: security
+    if: github.ref == 'refs/heads/main'   # <- clé pour sécurité CD
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -153,6 +154,7 @@ jobs:
   deploy:
     name: Deploy to Azure VM
     needs: docker
+    if: github.ref == 'refs/heads/main'   # <- déclenchement uniquement depuis main
     runs-on: ubuntu-latest
 
     steps:
