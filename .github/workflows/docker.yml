@@ -65,19 +65,20 @@ jobs:
       - run: npm run build
 
 
-  # 4 Qualité de code - SonarCloud
+  # 4 Qualité de code - SonarQube
   quality:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: SonarCloud Scan
+      - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
+            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.projectName=${{ secrets.SONAR_PROJECT_NAME }}
