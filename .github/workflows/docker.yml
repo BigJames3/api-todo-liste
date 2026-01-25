@@ -1,6 +1,7 @@
 name: CI/CD Pipeline - Build, Push & Deploy Docker Image
 
 on:
+  workflow_dispatch:
   # 1️ Analyse & tests AVANT merge (qualité du code)
   pull_request:
     branches:
