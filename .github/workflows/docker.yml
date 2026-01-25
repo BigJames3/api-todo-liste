@@ -1,6 +1,7 @@
 name: CI/CD Pipeline - Build, Push & Deploy Docker Image
 
 on:
+  workflow_dispatch:
   # 1️ Analyse & tests AVANT merge (qualité du code)
   pull_request:
     branches:
@@ -65,24 +66,33 @@ jobs:
       - run: npm run build
 
 
-  # 4 Qualité de code - SonarQube
+  # 4️⃣ Qualité de code – SonarCloud
   quality:
+    name: Code Quality Analysis (SonarCloud)
     needs: build
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: SonarQube Scan
+    steps:
+      # 1️⃣ Récupération du code avec l’historique complet (recommandé par Sonar)
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2️⃣ Analyse SonarCloud
+      - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
+          projectBaseDir: .
           args: >
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.projectName=${{ secrets.SONAR_PROJECT_NAME }}
             -Dsonar.sources=src
+
 
 
   # 5 Sécurité Docker - Trivy
