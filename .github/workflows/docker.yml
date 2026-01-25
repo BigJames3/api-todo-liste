@@ -93,8 +93,6 @@ jobs:
             -Dsonar.projectName=${{ secrets.SONAR_PROJECT_NAME }}
             -Dsonar.sources=src
 
-
-
   # 5 Sécurité Docker - Trivy
   security:
     needs: quality
